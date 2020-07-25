@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  selenium:
+    build:
+      context: .
+    volumes:
+        - ${APP_DIR}:/app
+        - ${CACHE_DIR}:/app/cache
