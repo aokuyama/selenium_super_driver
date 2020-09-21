@@ -1,8 +1,12 @@
 import os
 import pickle
+import random
+import time
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.alert import Alert
 
 class SuperDriver:
     cookies_path = '/app/cache/cookies.pkl'
@@ -42,14 +46,52 @@ class SuperDriver:
     def get(self, url):
         return self.driver.get(url)
 
+    def waiting(self):
+        time.sleep(random.uniform(1, 2))
+        pass
+
     def find_element_by_id(self, id):
+        self.waiting()
         return self.driver.find_element_by_id(id)
 
     def find_element_by_class_name(self, name):
+        self.waiting()
         return self.driver.find_element_by_class_name(name)
 
     def find_element_by_name(self, name):
+        self.waiting()
         return self.driver.find_element_by_name(name)
+    
+    def find_element_by_xpath(self, xpath):
+        self.waiting()
+        return self.driver.find_element_by_xpath(xpath)
+
+    def find_element_by_css_selector(self, css):
+        self.waiting()
+        return self.driver.find_element_by_css_selector(css)
+
+    def find_elements_by_css_selector(self, css):
+        self.waiting()
+        return self.driver.find_elements_by_css_selector(css)
+
+    def find_element_by_link_text(self, text):
+        self.waiting()
+        return self.driver.find_element_by_link_text(text)
+
+    def find_elements_by_link_text(self, text):
+        self.waiting()
+        return self.driver.find_elements_by_link_text(text)
+
+    def switch_to_frame(self, iframe):
+        self.waiting()
+        self.driver.switch_to_frame(iframe)
+        return self
+
+    def accept(self):
+        self.waiting()
+        self.waiting()
+        self.waiting()
+        Alert(self.driver).accept()
 
     def print_title(self):
         print(self.driver.title)
