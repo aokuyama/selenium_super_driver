@@ -10,8 +10,8 @@ from selenium.webdriver.common.alert import Alert
 
 class SuperDriver:
     cookies_path = '/app/cache/cookies.pkl'
-    screen_shot_img_path = '/app/cache/ss.png'
-    screen_shot_html_path = '/app/cache/ss.html'
+    screen_shot_img_path = '/app/cache/'
+    screen_shot_html_path = '/app/cache/'
     chromedriver_path = '/usr/lib/chromium/chromedriver'
     binary_location = '/usr/bin/chromium-browser'
 
@@ -61,7 +61,15 @@ class SuperDriver:
     def find_element_by_name(self, name):
         self.waiting()
         return self.driver.find_element_by_name(name)
-    
+
+    def find_elements_by_name(self, name):
+        self.waiting()
+        return self.driver.find_elements_by_name(name)
+
+    def fetch_element_by_name(self, name, target=0, found=1):
+        self.waiting()
+        return self.fetch_element(self.driver.find_elements_by_name(name), target, found)
+
     def find_element_by_xpath(self, xpath):
         self.waiting()
         return self.driver.find_element_by_xpath(xpath)
@@ -74,6 +82,10 @@ class SuperDriver:
         self.waiting()
         return self.driver.find_elements_by_css_selector(css)
 
+    def fetch_element_by_css_selector(self, css, target=0, found=1):
+        self.waiting()
+        return self.fetch_element(self.driver.find_elements_by_css_selector(css), target, found)
+
     def find_element_by_link_text(self, text):
         self.waiting()
         return self.driver.find_element_by_link_text(text)
@@ -81,6 +93,15 @@ class SuperDriver:
     def find_elements_by_link_text(self, text):
         self.waiting()
         return self.driver.find_elements_by_link_text(text)
+
+    def fetch_element_by_link_text(self, text, target=0, found=1):
+        self.waiting()
+        return self.fetch_element(self.driver.find_elements_by_link_text(text), target, found)
+
+    def fetch_element(self, elements, target, found):
+        if len(elements) == found:
+            return elements[target]
+        return
 
     def switch_to_frame(self, iframe):
         self.waiting()
@@ -101,17 +122,17 @@ class SuperDriver:
         print(self.driver.current_url)
         return self
 
-    def ss(self):
-        self.screen_shot()
-        self.screen_shot_html()
+    def ss(self, filename='ss'):
+        self.screen_shot(filename + '.png')
+        self.screen_shot_html(filename + '.html')
         return self
 
-    def screen_shot(self):
-        self.driver.save_screenshot(self.screen_shot_img_path)
+    def screen_shot(self, filename='ss.png'):
+        self.driver.save_screenshot(self.screen_shot_img_path + filename)
 
-    def screen_shot_html(self):
+    def screen_shot_html(self, filename='ss.html'):
         html = self.driver.page_source
-        with open(self.screen_shot_html_path, 'w', encoding='utf-8') as f:
+        with open(self.screen_shot_html_path + filename, 'w', encoding='utf-8') as f:
             f.write(html)
 
     def load_cookies(self):
