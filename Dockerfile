@@ -14,3 +14,4 @@ RUN curl -O https://noto-website.storage.googleapis.com/pkgs/NotoSansCJKjp-hinte
 
 RUN pip install selenium
 RUN pip install python-dateutil
+RUN pip install requests
