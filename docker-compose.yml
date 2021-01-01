@@ -7,3 +7,10 @@ services:
     volumes:
         - ${APP_DIR}:/app
         - ${CACHE_DIR}:/app/cache
+  dev:
+    build:
+      context: .
+    volumes:
+        - ${APP_DIR}:/app
+        - ${CACHE_DIR}:/app/cache
+    tty: true
