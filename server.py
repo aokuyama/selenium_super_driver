@@ -1,8 +1,11 @@
-from http.server import HTTPServer
-from importlib import import_module
-import os
+import server_base
 
-address = ('', 3000)
-module = import_module(os.environ['REQUEST_HANDLER'])
-with HTTPServer(address, module.HTTPRequestHandler) as server:
-    server.serve_forever()
+class HTTPRequestHandler(server_base.HTTPRequestHandler):
+    def get_response(self, path, query):
+        return b"OK"
+
+    def post_response(self, path, query):
+        print(query)
+        return query
+
+server_base.ready(HTTPRequestHandler)

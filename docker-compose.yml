@@ -13,8 +13,6 @@ services:
     volumes:
         - ${APP_DIR}:/app
         - ${CACHE_DIR}:/app/cache
-    environment:
-      - REQUEST_HANDLER=${REQUEST_HANDLER}
     tty: true
     ports:
       - "${SERVER_PORT}:3000"
