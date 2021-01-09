@@ -3,7 +3,7 @@ from urllib.parse import parse_qs, urlparse
 import json
 
 def ready(handler):
-    address = ('', 3000)
+    address = ('', 80)
     with HTTPServer(address, handler) as server:
         server.serve_forever()
 
