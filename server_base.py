@@ -35,12 +35,11 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         
         print('body = {}'.format(self.rfile.read(content_length).decode('utf-8')))
         
-        response = self.post_response(parsed_path.path, parsed_path.query)
+        response = self.post_response(parsed_path.path, parse_qs(parsed_path.query))
 
         self.send_response(200)
         self.send_header('Content-Type', 'application/json; charset=utf-8')
         self.end_headers()
-        res = [0,1,2]
         res = json.dumps(response)
         self.wfile.write(res.encode('utf-8'))
 
