@@ -17,3 +17,11 @@ services:
     ports:
       - "${SERVER_PORT}:3000"
     command: python server.py
+    networks:
+      - default
+      - external
+
+networks:
+  external:
+    name: ${EXTERNAL_NETWORK}
+    external: true
