@@ -32,10 +32,10 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         print('headers\r\n-----\r\n{}-----'.format(self.headers))
 
         content_length = int(self.headers['content-length'])
-        
-        print('body = {}'.format(self.rfile.read(content_length).decode('utf-8')))
-        
-        response = self.post_response(parsed_path.path, parse_qs(parsed_path.query))
+
+        body = '{}'.format(self.rfile.read(content_length).decode('utf-8'))
+        print('body = ' + body)
+        response = self.post_response(parsed_path.path, json.loads(body))
 
         self.send_response(200)
         self.send_header('Content-Type', 'application/json; charset=utf-8')
