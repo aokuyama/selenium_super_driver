@@ -10,5 +10,10 @@
 
 開発用（コンテナにはいる場合）
 ```bash
-    selenium-super-driver/exec.sh
+    selenium-super-driver/dev.sh
+```
+
+サーバーモード
+```bash
+    selenium-super-driver/server.sh
 ```
