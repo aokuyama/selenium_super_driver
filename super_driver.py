@@ -2,7 +2,7 @@ import os
 import pickle
 import random
 import time
-
+import unittest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
@@ -27,7 +27,6 @@ class SuperDriver:
 
     def createService(self):
         service = Service(executable_path=self.chromedriver_path)
-        service.start()
         return service
 
     def createDriver(self, service, options):
@@ -36,66 +35,73 @@ class SuperDriver:
             desired_capabilities = options.to_capabilities()
         )
 
-    def make(self):
-        options = self.createOption()
+    def make(self, waiter):
+        self.options = self.createOption()
         self.service = self.createService()
-        self.driver = self.createDriver(self.service, options)
-        self.load_cookies()
+        self.waiter = waiter
+        self.driver = False
         return self
-    
-    def get(self, url):
-        return self.driver.get(url)
+
+    def standby(self):
+        if (not self.driver):
+            self.service.start()
+            self.driver = self.createDriver(self.service, self.options)
+            self.load_cookies()
+        return self.waiting()
 
     def waiting(self):
-        time.sleep(random.uniform(1, 2))
-        pass
+        return self.waiter.waiting()
+
+    def get(self, url):
+        self.standby()
+        return self.driver.get(url)
 
     def find_element_by_id(self, id):
-        self.waiting()
+        self.standby()
         return self.driver.find_element_by_id(id)
 
     def find_element_by_class_name(self, name):
-        self.waiting()
+        self.standby()
         return self.driver.find_element_by_class_name(name)
 
     def find_element_by_name(self, name):
-        self.waiting()
+        self.standby()
         return self.driver.find_element_by_name(name)
 
     def find_elements_by_name(self, name):
-        self.waiting()
+        self.standby()
         return self.driver.find_elements_by_name(name)
 
     def fetch_element_by_name(self, name, target=0, found=1):
-        self.waiting()
+        self.standby()
         return self.fetch_element(self.driver.find_elements_by_name(name), target, found)
 
     def find_element_by_xpath(self, xpath):
-        self.waiting()
+        self.standby()
         return self.driver.find_element_by_xpath(xpath)
 
     def find_element_by_css_selector(self, css):
-        self.waiting()
+        self.standby()
         return self.driver.find_element_by_css_selector(css)
 
     def find_elements_by_css_selector(self, css):
-        self.waiting()
+        self.standby()
         return self.driver.find_elements_by_css_selector(css)
 
     def fetch_element_by_css_selector(self, css, target=0, found=1):
-        self.waiting()
+        self.standby()
         return self.fetch_element(self.driver.find_elements_by_css_selector(css), target, found)
 
     def find_element_by_link_text(self, text):
-        self.waiting()
+        self.standby()
         return self.driver.find_element_by_link_text(text)
 
     def find_elements_by_link_text(self, text):
-        self.waiting()
+        self.standby()
         return self.driver.find_elements_by_link_text(text)
 
     def fetch_element_by_link_text(self, text, target=0, found=1):
-        self.waiting()
+        self.standby()
         return self.fetch_element(self.driver.find_elements_by_link_text(text), target, found)
 
     def fetch_element(self, elements, target, found):
@@ -104,14 +110,14 @@ class SuperDriver:
         return
 
     def switch_to_frame(self, iframe):
-        self.waiting()
+        self.standby()
         self.driver.switch_to_frame(iframe)
         return self
 
     def accept(self):
-        self.waiting()
-        self.waiting()
-        self.waiting()
+        self.standby()
+        self.standby()
+        self.standby()
         Alert(self.driver).accept()
 
     def print_title(self):
@@ -151,9 +157,35 @@ class SuperDriver:
         pickle.dump(self.driver.get_cookies() , open(self.cookies_path, 'wb'))
 
     def quit(self):
-        self.save_cookies()
-        self.driver.quit()
-        self.service.stop()
+        if (self.driver):
+            self.save_cookies()
+            self.driver.quit()
+            self.service.stop()
 
-def get():
-    return SuperDriver().make()
+class Waiter:
+    def waiting(self):
+        time.sleep(random.uniform(1, 2))
+        return True
+class NoWaiter:
+    def waiting(self):
+        return False
+
+def get(no_wait=False):
+    if (no_wait):
+        waiter = NoWaiter()
+    else:
+        waiter = Waiter()
+    return SuperDriver().make(waiter)
+
+class TestSuperDriver(unittest.TestCase):
+    def setUp(self):
+        self.driver = get()
+
+    def testウェイトなし(self):
+        self.driver = get({'no_wait': True})
+        self.assertEqual(False, self.driver.waiter.waiting())
+    def testロードなしで終了(self):
+        self.driver.quit()
+
+if __name__ == '__main__':
+    unittest.main()
