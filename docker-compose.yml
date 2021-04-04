@@ -9,7 +9,7 @@ services:
         - ${APP_DIR}:/app
         - ${CACHE_DIR}:/app/cache
   server:
-    container_name: selenium-server
+    container_name: ${SERVER_NAME}
     build:
       context: .
     volumes:
