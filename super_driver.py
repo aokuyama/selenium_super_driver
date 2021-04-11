@@ -7,6 +7,10 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.alert import Alert
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 
 class SuperDriver:
     cookies_path = '/app/cache/cookies.pkl'
@@ -80,6 +84,14 @@ class SuperDriver:
         self.standby()
         return self.driver.find_element_by_xpath(xpath)
 
+    def find_elements_by_xpath(self, xpath):
+        self.standby()
+        return self.driver.find_elements_by_xpath(xpath)
+
+    def fetch_element_by_xpath(self, xpath, target=0, found=1):
+        self.standby()
+        return self.fetch_element(self.driver.find_elements_by_xpath(xpath), target, found)
+
     def find_element_by_css_selector(self, css):
         self.standby()
         return self.driver.find_element_by_css_selector(css)
@@ -108,6 +120,30 @@ class SuperDriver:
         if len(elements) == found:
             return elements[target]
         return
+    def element_to_be_clickable_by_xpath(self, name, sec=5):
+        return self.element_to_be_clickable_by(By.XPATH, name, sec=5)
+
+    def element_to_be_clickable_by(self, by, name, sec=5):
+        try:
+            element = WebDriverWait(self.driver, sec).until(
+                EC.element_to_be_clickable((by, name))
+            )
+        except TimeoutException:
+            return
+        return element
+    def visibility_of_element_located_by_css_selector(self, name, sec=5):
+        return self.visibility_of_element_located_by(By.CSS_SELECTOR, name, sec=5)
+    def visibility_of_element_located_by_xpath(self, name, sec=5):
+        return self.visibility_of_element_located_by(By.XPATH, name, sec=5)
+
+    def visibility_of_element_located_by(self, by, name, sec=5):
+        try:
+            element = WebDriverWait(self.driver, sec).until(
+                EC.visibility_of_element_located((by, name))
+            )
+        except TimeoutException:
+            return
+        return element
 
     def switch_to_frame(self, iframe):
         self.standby()
