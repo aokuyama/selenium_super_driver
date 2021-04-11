@@ -12,6 +12,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
+
 class SuperDriver:
     cookies_path = '/app/cache/cookies.pkl'
     screen_shot_img_path = '/app/cache/'
@@ -26,7 +27,8 @@ class SuperDriver:
         options.add_argument('--disable-gpu')
         options.add_argument('--no-sandbox')
         options.add_argument('--window-size=1200x600')
-        options.add_argument(f'user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36')
+        options.add_argument(
+            f'user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36')
         return options
 
     def createService(self):
@@ -36,7 +38,7 @@ class SuperDriver:
     def createDriver(self, service, options):
         return webdriver.Remote(
             service.service_url,
-            desired_capabilities = options.to_capabilities()
+            desired_capabilities=options.to_capabilities()
         )
 
     def make(self, waiter):
@@ -120,6 +122,7 @@ class SuperDriver:
         if len(elements) == found:
             return elements[target]
         return
+
     def element_to_be_clickable_by_xpath(self, name, sec=5):
         return self.element_to_be_clickable_by(By.XPATH, name, sec=5)
 
@@ -131,8 +134,10 @@ class SuperDriver:
         except TimeoutException:
             return
         return element
+
     def visibility_of_element_located_by_css_selector(self, name, sec=5):
         return self.visibility_of_element_located_by(By.CSS_SELECTOR, name, sec=5)
+
     def visibility_of_element_located_by_xpath(self, name, sec=5):
         return self.visibility_of_element_located_by(By.XPATH, name, sec=5)
 
@@ -190,7 +195,7 @@ class SuperDriver:
         self.driver.get('https://www.google.com/')
 
     def save_cookies(self):
-        pickle.dump(self.driver.get_cookies() , open(self.cookies_path, 'wb'))
+        pickle.dump(self.driver.get_cookies(), open(self.cookies_path, 'wb'))
 
     def quit(self):
         if (self.driver):
@@ -198,13 +203,17 @@ class SuperDriver:
             self.driver.quit()
             self.service.stop()
 
+
 class Waiter:
     def waiting(self):
         time.sleep(random.uniform(1, 2))
         return True
+
+
 class NoWaiter:
     def waiting(self):
         return False
+
 
 def get(no_wait=False):
     if (no_wait):
@@ -213,6 +222,7 @@ def get(no_wait=False):
         waiter = Waiter()
     return SuperDriver().make(waiter)
 
+
 class TestSuperDriver(unittest.TestCase):
     def setUp(self):
         self.driver = get()
@@ -220,8 +230,10 @@ class TestSuperDriver(unittest.TestCase):
     def testウェイトなし(self):
         self.driver = get({'no_wait': True})
         self.assertEqual(False, self.driver.waiter.waiting())
+
     def testロードなしで終了(self):
         self.driver.quit()
+
 
 if __name__ == '__main__':
     unittest.main()
