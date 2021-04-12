@@ -12,8 +12,3 @@
 ```bash
     selenium-super-driver/dev.sh
 ```
-
-サーバーモード
-```bash
-    selenium-super-driver/server.sh
-```
