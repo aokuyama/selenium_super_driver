@@ -1,10 +1,12 @@
 version: '3.6'
 
 services:
-  selenium:
+  dev:
     container_name: selenium-app
     build:
       context: .
+    environment:
+      - USER_SESSION_DIR=${USER_SESSION_DIR}
     volumes:
         - ${APP_DIR}:/app
-        - ${CACHE_DIR}:/app/cache
+        - ${CACHE_DIR}:${USER_SESSION_DIR}

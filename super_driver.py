@@ -183,18 +183,18 @@ class SuperDriver:
         return self
 
     def screen_shot(self, filename='ss.png'):
-        self.driver.save_screenshot(self.screen_shot_img_path + filename)
+        self.driver.save_screenshot(self.screen_shot_img_path() + filename)
 
     def screen_shot_html(self, filename='ss.html'):
         html = self.driver.page_source
-        with open(self.screen_shot_html_path + filename, 'w', encoding='utf-8') as f:
+        with open(self.screen_shot_html_path() + filename, 'w', encoding='utf-8') as f:
             f.write(html)
 
     def load_cookies(self):
-        if not os.path.isfile(self.cookies_path):
+        if not os.path.isfile(self.cookies_path()):
             return
         self.get_dummy_page()
-        cookies = pickle.load(open(self.cookies_path, 'rb'))
+        cookies = pickle.load(open(self.cookies_path(), 'rb'))
         for cookie in cookies:
             self.driver.add_cookie(cookie)
 
@@ -203,7 +203,19 @@ class SuperDriver:
         self.driver.get('https://www.google.com/')
 
     def save_cookies(self):
-        pickle.dump(self.driver.get_cookies(), open(self.cookies_path, 'wb'))
+        pickle.dump(self.driver.get_cookies(), open(self.cookies_path(), 'wb'))
+
+    def user_session_dir(self):
+        return os.getenv('USER_SESSION_DIR', '/app/cache/')
+
+    def cookies_path(self):
+        return self.user_session_dir() + 'cookies.pkl'
+
+    def screen_shot_img_path(self):
+        return self.user_session_dir()
+
+    def screen_shot_html_path(self):
+        return self.user_session_dir()
 
     def quit(self):
         if (self.driver):
@@ -233,6 +245,7 @@ def get(no_wait=False):
 
 class TestSuperDriver(unittest.TestCase):
     def setUp(self):
+        os.environ.pop('USER_SESSION_DIR', None)
         self.driver = get()
 
     def testウェイトなし(self):
@@ -242,6 +255,16 @@ class TestSuperDriver(unittest.TestCase):
     def testロードなしで終了(self):
         self.driver.quit()
 
+    def testデフォルトのキャッシュ用パス(self):
+        self.assertEqual('/app/cache/cookies.pkl', self.driver.cookies_path())
+        self.assertEqual('/app/cache/', self.driver.screen_shot_img_path())
+        self.assertEqual('/app/cache/', self.driver.screen_shot_html_path())
+
+    def test環境変数でキャッシュ用パス置き換え(self):
+        os.environ['USER_SESSION_DIR'] = '/mnt/efs/'
+        self.assertEqual('/mnt/efs/cookies.pkl', self.driver.cookies_path())
+        self.assertEqual('/mnt/efs/', self.driver.screen_shot_img_path())
+        self.assertEqual('/mnt/efs/', self.driver.screen_shot_html_path())
 
 if __name__ == '__main__':
     unittest.main()
