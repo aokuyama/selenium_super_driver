@@ -14,9 +14,6 @@ from selenium.common.exceptions import TimeoutException
 
 
 class SuperDriver:
-    cookies_path = '/app/cache/cookies.pkl'
-    screen_shot_img_path = '/app/cache/'
-    screen_shot_html_path = '/app/cache/'
     chromedriver_path = '/usr/lib/chromium/chromedriver'
     binary_location = '/usr/bin/chromium-browser'
 
@@ -33,7 +30,7 @@ class SuperDriver:
         options.add_argument("--disable-infobars")
         options.add_argument("--hide-scrollbars")
         options.add_argument("--enable-logging")
-        options.add_argument("--log-level=0")
+        options.add_argument("--log-level=1")
         options.add_argument("--ignore-certificate-errors")
         options.add_argument(
             f'user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36')
@@ -262,6 +259,12 @@ class TestSuperDriver(unittest.TestCase):
 
     def test環境変数でキャッシュ用パス置き換え(self):
         os.environ['USER_SESSION_DIR'] = '/mnt/efs/'
+        self.assertEqual('/mnt/efs/cookies.pkl', self.driver.cookies_path())
+        self.assertEqual('/mnt/efs/', self.driver.screen_shot_img_path())
+        self.assertEqual('/mnt/efs/', self.driver.screen_shot_html_path())
+
+    def testスラッシュ忘れへの対応(self):
+        os.environ['USER_SESSION_DIR'] = '/mnt/efs'
         self.assertEqual('/mnt/efs/cookies.pkl', self.driver.cookies_path())
         self.assertEqual('/mnt/efs/', self.driver.screen_shot_img_path())
         self.assertEqual('/mnt/efs/', self.driver.screen_shot_html_path())
