@@ -3,6 +3,7 @@ import pickle
 import random
 import time
 import unittest
+from pathlib import PurePath
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
@@ -14,12 +15,9 @@ from selenium.common.exceptions import TimeoutException
 
 
 class SuperDriver:
-    chromedriver_path = '/usr/lib/chromium/chromedriver'
-    binary_location = '/usr/bin/chromium-browser'
-
     def createOption(self):
         options = Options()
-        options.binary_location = self.binary_location
+        options.binary_location = self.binary_location()
         options.add_argument("--headless")
         options.add_argument("--no-sandbox")
         options.add_argument("--single-process")
@@ -37,7 +35,7 @@ class SuperDriver:
         return options
 
     def createService(self):
-        service = Service(executable_path=self.chromedriver_path)
+        service = Service(executable_path=self.chromedriver_path())
         return service
 
     def createDriver(self, service, options):
@@ -206,13 +204,19 @@ class SuperDriver:
         return os.getenv('USER_SESSION_DIR', '/app/cache/')
 
     def cookies_path(self):
-        return self.user_session_dir() + 'cookies.pkl'
+        return str(PurePath(self.user_session_dir(), 'cookies.pkl'))
 
     def screen_shot_img_path(self):
-        return self.user_session_dir()
+        return str(PurePath(self.user_session_dir()))
 
     def screen_shot_html_path(self):
-        return self.user_session_dir()
+        return str(PurePath(self.user_session_dir()))
+
+    def chromedriver_path(self):
+        return os.getenv('PATH_CHROME_DRIVER', '/usr/lib/chromium/chromedriver')
+
+    def binary_location(self):
+        return os.getenv('PATH_CHROME_BIN', '/usr/bin/chromium-browser')
 
     def quit(self):
         if (self.driver):
@@ -254,20 +258,35 @@ class TestSuperDriver(unittest.TestCase):
 
     def testデフォルトのキャッシュ用パス(self):
         self.assertEqual('/app/cache/cookies.pkl', self.driver.cookies_path())
-        self.assertEqual('/app/cache/', self.driver.screen_shot_img_path())
-        self.assertEqual('/app/cache/', self.driver.screen_shot_html_path())
+        self.assertEqual('/app/cache', self.driver.screen_shot_img_path())
+        self.assertEqual('/app/cache', self.driver.screen_shot_html_path())
 
     def test環境変数でキャッシュ用パス置き換え(self):
         os.environ['USER_SESSION_DIR'] = '/mnt/efs/'
         self.assertEqual('/mnt/efs/cookies.pkl', self.driver.cookies_path())
-        self.assertEqual('/mnt/efs/', self.driver.screen_shot_img_path())
-        self.assertEqual('/mnt/efs/', self.driver.screen_shot_html_path())
+        self.assertEqual('/mnt/efs', self.driver.screen_shot_img_path())
+        self.assertEqual('/mnt/efs', self.driver.screen_shot_html_path())
 
     def testスラッシュ忘れへの対応(self):
         os.environ['USER_SESSION_DIR'] = '/mnt/efs'
         self.assertEqual('/mnt/efs/cookies.pkl', self.driver.cookies_path())
-        self.assertEqual('/mnt/efs/', self.driver.screen_shot_img_path())
-        self.assertEqual('/mnt/efs/', self.driver.screen_shot_html_path())
+        self.assertEqual('/mnt/efs', self.driver.screen_shot_img_path())
+        self.assertEqual('/mnt/efs', self.driver.screen_shot_html_path())
+
+    def testchromeへのパスのデフォルト(self):
+        self.assertEqual('/usr/lib/chromium/chromedriver',
+                         self.driver.chromedriver_path())
+        self.assertEqual('/usr/bin/chromium-browser',
+                         self.driver.binary_location())
+
+    def test環境変数でchromeパス置き換え(self):
+        os.environ['PATH_CHROME_DRIVER'] = '/var/task/bin/chromedriver'
+        os.environ['PATH_CHROME_BIN'] = '/var/task/bin/chromium-browser'
+        self.assertEqual('/var/task/bin/chromedriver',
+                         self.driver.chromedriver_path())
+        self.assertEqual('/var/task/bin/chromium-browser',
+                         self.driver.binary_location())
+
 
 if __name__ == '__main__':
     unittest.main()
