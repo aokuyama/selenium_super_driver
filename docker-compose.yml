@@ -2,7 +2,6 @@ version: '3.6'
 
 services:
   dev:
-    container_name: selenium-app
     build:
       context: .
     environment:

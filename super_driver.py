@@ -28,7 +28,7 @@ class SuperDriver:
         options.add_argument("--disable-infobars")
         options.add_argument("--hide-scrollbars")
         options.add_argument("--enable-logging")
-        options.add_argument("--log-level=1")
+        options.add_argument("--log-level=0")
         options.add_argument("--ignore-certificate-errors")
         options.add_argument(
             f'user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36')
