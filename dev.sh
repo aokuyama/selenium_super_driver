@@ -1,3 +1,3 @@
 #!/bin/sh
 cd `dirname $0`
-docker-compose run dev ash
+docker-compose run app ash
