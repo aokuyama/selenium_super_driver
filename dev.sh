@@ -1,3 +1,3 @@
 #!/bin/sh
 cd `dirname $0`
-docker-compose run selenium ash
+docker-compose run dev ash
