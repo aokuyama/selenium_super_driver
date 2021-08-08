@@ -4,7 +4,7 @@ import random
 import time
 import unittest
 from pathlib import PurePath
-from selenium import webdriver
+from seleniumwire import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.alert import Alert
@@ -30,6 +30,7 @@ class SuperDriver:
         options.add_argument("--enable-logging")
         options.add_argument("--log-level=0")
         options.add_argument("--ignore-certificate-errors")
+        options.add_argument('--user-data-dir=' + self.user_session_dir())
         options.add_argument(
             f'user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36')
         return options
@@ -38,10 +39,31 @@ class SuperDriver:
         service = Service(executable_path=self.chromedriver_path())
         return service
 
+    def createSeleniumWireOptions(self):
+        options = {}
+        proxy = None
+        host = os.getenv('PROXY_HOST')
+        port = os.getenv('PROXY_PORT')
+        user = os.getenv('PROXY_USER')
+        password = os.getenv('PROXY_PASSWORD')
+        if (host and port):
+            if (user and password):
+                proxy = f'http://{user}:{password}@{host}:{port}'
+            else:
+                proxy = f'http://{host}:{port}'
+        if (proxy):
+            options = {
+                'proxy': {
+                    'https': proxy,
+                }
+            }
+        return options
+
     def createDriver(self, service, options):
         return webdriver.Remote(
             service.service_url,
-            desired_capabilities=options.to_capabilities()
+            desired_capabilities=options.to_capabilities(),
+            seleniumwire_options=self.createSeleniumWireOptions()
         )
 
     def make(self, waiter):
@@ -56,6 +78,7 @@ class SuperDriver:
             self.service.start()
             self.driver = self.createDriver(self.service, self.options)
             self.load_cookies()
+            self.driver.implicitly_wait(30)
         return self.waiting()
 
     def waiting(self):
@@ -178,11 +201,12 @@ class SuperDriver:
         return self
 
     def screen_shot(self, filename='ss.png'):
-        self.driver.save_screenshot(self.screen_shot_img_path() + filename)
+        self.driver.save_screenshot(
+            self.screen_shot_img_path() + "/" + filename)
 
     def screen_shot_html(self, filename='ss.html'):
         html = self.driver.page_source
-        with open(self.screen_shot_html_path() + filename, 'w', encoding='utf-8') as f:
+        with open(self.screen_shot_html_path() + "/" + filename, 'w', encoding='utf-8') as f:
             f.write(html)
 
     def load_cookies(self):
@@ -274,6 +298,10 @@ class TestSuperDriver(unittest.TestCase):
         self.assertEqual('/mnt/efs', self.driver.screen_shot_html_path())
 
     def testchromeへのパスのデフォルト(self):
+        if os.getenv('PATH_CHROME_DRIVER'):
+            del os.environ['PATH_CHROME_DRIVER']
+        if os.getenv('PATH_CHROME_BIN'):
+            del os.environ['PATH_CHROME_BIN']
         self.assertEqual('/usr/lib/chromium/chromedriver',
                          self.driver.chromedriver_path())
         self.assertEqual('/usr/bin/chromium-browser',
@@ -286,6 +314,35 @@ class TestSuperDriver(unittest.TestCase):
                          self.driver.chromedriver_path())
         self.assertEqual('/var/task/bin/chromium-browser',
                          self.driver.binary_location())
+
+    def test_プロキシ設定がない(self):
+        if os.getenv('PROXY_HOST'):
+            del os.environ['PROXY_HOST']
+        self.assertEqual({}, self.driver.createSeleniumWireOptions())
+
+    def test_プロキシ設定がある(self):
+        if os.getenv('PROXY_USER'):
+            del os.environ['PROXY_USER']
+        os.environ['PROXY_HOST'] = 'example.com'
+        os.environ['PROXY_PORT'] = '3128'
+        equal = {
+            'proxy': {
+                'https': f'http://example.com:3128',
+            }
+        }
+        self.assertEqual(equal, self.driver.createSeleniumWireOptions())
+
+    def test_認証つきプロキシ設定がある(self):
+        os.environ['PROXY_HOST'] = 'test.example.com'
+        os.environ['PROXY_PORT'] = '13128'
+        os.environ['PROXY_USER'] = 'john'
+        os.environ['PROXY_PASSWORD'] = 'ABCDefg1234'
+        equal = {
+            'proxy': {
+                'https': f'http://john:ABCDefg1234@test.example.com:13128',
+            }
+        }
+        self.assertEqual(equal, self.driver.createSeleniumWireOptions())
 
 
 if __name__ == '__main__':

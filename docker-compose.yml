@@ -8,6 +8,10 @@ services:
       - USER_SESSION_DIR=${USER_SESSION_DIR}
       - PATH_CHROME_DRIVER=/opt/chromium/chromedriver
       - PATH_CHROME_BIN=/opt/chromium/headless-chromium
+      - PROXY_HOST=${PROXY_HOST:-}
+      - PROXY_PORT=${PROXY_PORT:-}
+      - PROXY_USER=${PROXY_USER:-}
+      - PROXY_PASSWORD=${PROXY_PASSWORD:-}
     volumes:
         - ${APP_DIR}:/var/task
         - ${CACHE_DIR}:${USER_SESSION_DIR}
