@@ -6,7 +6,9 @@ services:
       context: .
     environment:
       - USER_SESSION_DIR=${USER_SESSION_DIR}
+      - PATH_CHROME_DRIVER=/opt/chromium/chromedriver
+      - PATH_CHROME_BIN=/opt/chromium/headless-chromium
     volumes:
-        - ${APP_DIR}:/app
+        - ${APP_DIR}:/var/task
         - ${CACHE_DIR}:${USER_SESSION_DIR}
     tty: true

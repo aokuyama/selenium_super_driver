@@ -1,0 +1,3 @@
+requests
+python-dateutil
+selenium == 3.141
