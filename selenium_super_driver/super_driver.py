@@ -104,6 +104,10 @@ class SuperDriver:
         self.standby()
         return self.driver.find_elements_by_name(name)
 
+    def fetch_element_by_id(self, name, target=0, found=1):
+        self.standby()
+        return self.fetch_element(self.driver.find_elements_by_id(name), target, found)
+
     def fetch_element_by_name(self, name, target=0, found=1):
         self.standby()
         return self.fetch_element(self.driver.find_elements_by_name(name), target, found)
