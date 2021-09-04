@@ -12,9 +12,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from logger import get_logger, get_test_logger
 
 
 class SuperDriver:
+    def __init__(self, logger):
+        self.logger = logger
+
     def createOption(self):
         options = Options()
         options.binary_location = self.binary_location()
@@ -192,11 +196,11 @@ class SuperDriver:
         Alert(self.driver).accept()
 
     def print_title(self):
-        print(self.driver.title)
+        self.logger.info(self.driver.title)
         return self
 
     def print_url(self):
-        print(self.driver.current_url)
+        self.logger.info(self.driver.current_url)
         return self
 
     def ss(self, filename='ss'):
@@ -264,18 +268,20 @@ class NoWaiter:
         return False
 
 
-def get(no_wait=False):
+def get(no_wait=False, logger=None):
+    if (not logger):
+        logger = get_logger('selenium')
     if (no_wait):
         waiter = NoWaiter()
     else:
         waiter = Waiter()
-    return SuperDriver().make(waiter)
+    return SuperDriver(logger=logger).make(waiter)
 
 
 class TestSuperDriver(unittest.TestCase):
     def setUp(self):
         os.environ.pop('USER_SESSION_DIR', None)
-        self.driver = get()
+        self.driver = get(logger=get_test_logger())
 
     def testウェイトなし(self):
         self.driver = get({'no_wait': True})
