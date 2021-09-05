@@ -235,14 +235,17 @@ class SuperDriver:
     def user_session_dir(self):
         return os.getenv('USER_SESSION_DIR', '/app/cache/')
 
+    def user_download_dir(self):
+        return os.getenv('USER_DOWNLOAD_DIR', '/app/cache/')
+
     def cookies_path(self):
         return str(PurePath(self.user_session_dir(), 'cookies.pkl'))
 
     def screen_shot_img_path(self):
-        return str(PurePath(self.user_session_dir()))
+        return str(PurePath(self.user_download_dir()))
 
     def screen_shot_html_path(self):
-        return str(PurePath(self.user_session_dir()))
+        return str(PurePath(self.user_download_dir()))
 
     def chromedriver_path(self):
         return os.getenv('PATH_CHROME_DRIVER', '/usr/lib/chromium/chromedriver')
@@ -281,6 +284,7 @@ def get(no_wait=False, logger=None):
 class TestSuperDriver(unittest.TestCase):
     def setUp(self):
         os.environ.pop('USER_SESSION_DIR', None)
+        os.environ.pop('USER_DOWNLOAD_DIR', None)
         self.driver = get(logger=get_test_logger())
 
     def testウェイトなし(self):
@@ -297,15 +301,15 @@ class TestSuperDriver(unittest.TestCase):
 
     def test環境変数でキャッシュ用パス置き換え(self):
         os.environ['USER_SESSION_DIR'] = '/mnt/efs/'
+        os.environ['USER_DOWNLOAD_DIR'] = '/mnt/efs2/'
         self.assertEqual('/mnt/efs/cookies.pkl', self.driver.cookies_path())
-        self.assertEqual('/mnt/efs', self.driver.screen_shot_img_path())
-        self.assertEqual('/mnt/efs', self.driver.screen_shot_html_path())
+        self.assertEqual('/mnt/efs2', self.driver.screen_shot_html_path())
 
     def testスラッシュ忘れへの対応(self):
         os.environ['USER_SESSION_DIR'] = '/mnt/efs'
+        os.environ['USER_DOWNLOAD_DIR'] = '/mnt/efs2'
         self.assertEqual('/mnt/efs/cookies.pkl', self.driver.cookies_path())
-        self.assertEqual('/mnt/efs', self.driver.screen_shot_img_path())
-        self.assertEqual('/mnt/efs', self.driver.screen_shot_html_path())
+        self.assertEqual('/mnt/efs2', self.driver.screen_shot_html_path())
 
     def testchromeへのパスのデフォルト(self):
         if os.getenv('PATH_CHROME_DRIVER'):
