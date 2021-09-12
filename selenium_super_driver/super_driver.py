@@ -209,10 +209,12 @@ class SuperDriver:
         return self
 
     def screen_shot(self, filename='ss.png'):
+        os.makedirs(self.screen_shot_img_path(), exist_ok=True)
         self.driver.save_screenshot(
             self.screen_shot_img_path() + "/" + filename)
 
     def screen_shot_html(self, filename='ss.html'):
+        os.makedirs(self.screen_shot_html_path(), exist_ok=True)
         html = self.driver.page_source
         with open(self.screen_shot_html_path() + "/" + filename, 'w', encoding='utf-8') as f:
             f.write(html)
