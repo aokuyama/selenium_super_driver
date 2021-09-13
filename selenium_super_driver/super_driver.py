@@ -27,6 +27,7 @@ class SuperDriver:
         options.add_argument("--single-process")
         options.add_argument("--disable-gpu")
         options.add_argument("--window-size=1280x800")
+        options.add_argument('--start-maximized')
         options.add_argument("--disable-application-cache")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-infobars")
@@ -35,8 +36,7 @@ class SuperDriver:
         options.add_argument("--log-level=0")
         options.add_argument("--ignore-certificate-errors")
         options.add_argument('--user-data-dir=' + self.user_session_dir())
-        options.add_argument(
-            f'user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36')
+        options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36')
         return options
 
     def createService(self):
@@ -82,7 +82,7 @@ class SuperDriver:
             self.service.start()
             self.driver = self.createDriver(self.service, self.options)
             self.load_cookies()
-            self.driver.implicitly_wait(30)
+            self.driver.implicitly_wait(5)
         return self.waiting()
 
     def waiting(self):
