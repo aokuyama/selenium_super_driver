@@ -4,7 +4,6 @@ import random
 import time
 import unittest
 from pathlib import PurePath
-from seleniumwire import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.alert import Alert
@@ -64,10 +63,18 @@ class SuperDriver:
         return options
 
     def createDriver(self, service, options):
+        seleniumwire_options = self.createSeleniumWireOptions()
+        if (seleniumwire_options):
+            from seleniumwire import webdriver
+            return webdriver.Remote(
+                service.service_url,
+                desired_capabilities=options.to_capabilities(),
+                seleniumwire_options=self.createSeleniumWireOptions()
+            )
+        from selenium import webdriver
         return webdriver.Remote(
             service.service_url,
             desired_capabilities=options.to_capabilities(),
-            seleniumwire_options=self.createSeleniumWireOptions()
         )
 
     def make(self, waiter):
