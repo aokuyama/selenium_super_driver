@@ -1,7 +1,7 @@
-from logging import getLogger, StreamHandler, DEBUG, CRITICAL
+from logging import getLogger, StreamHandler, INFO, CRITICAL
 
 
-def get_logger(name=None, level=DEBUG):
+def get_logger(name=None, level=INFO):
     logger = getLogger(name)
     handler = StreamHandler()
     handler.setLevel(level)
