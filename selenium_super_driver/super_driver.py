@@ -34,7 +34,6 @@ class SuperDriver:
         options.add_argument("--enable-logging")
         options.add_argument("--log-level=0")
         options.add_argument("--ignore-certificate-errors")
-        options.add_argument('--user-data-dir=' + self.user_session_dir())
         options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36')
         return options
 
@@ -239,6 +238,7 @@ class SuperDriver:
         self.driver.get('https://www.google.com/')
 
     def save_cookies(self):
+        os.makedirs(self.cookies_dir(), exist_ok=True)
         pickle.dump(self.driver.get_cookies(), open(self.cookies_path(), 'wb'))
 
     def user_session_dir(self):
@@ -247,8 +247,11 @@ class SuperDriver:
     def user_download_dir(self):
         return os.getenv('USER_DOWNLOAD_DIR', '/app/cache/')
 
+    def cookies_dir(self):
+        return str(PurePath(self.user_session_dir()))
+
     def cookies_path(self):
-        return str(PurePath(self.user_session_dir(), 'cookies.pkl'))
+        return str(PurePath(self.cookies_dir(), 'cookies.pkl'))
 
     def screen_shot_img_path(self):
         return str(PurePath(self.user_download_dir()))
