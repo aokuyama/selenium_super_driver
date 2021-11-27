@@ -14,6 +14,7 @@ RUN mkdir -p /opt/chromium && chmod 777 /opt/chromium
 COPY --from=build /opt/chromium/headless-chromium /opt/chromium
 COPY --from=build /opt/chromium/chromedriver /opt/chromium
 
+RUN yum install -y git
 COPY ./requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
 

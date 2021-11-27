@@ -11,7 +11,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
-from logger import get_logger, get_test_logger
+from logger_handler.logger import get_logger, get_test_logger
 
 
 class SuperDriver:
