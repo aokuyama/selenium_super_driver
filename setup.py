@@ -3,7 +3,7 @@ import setuptools
  
 setuptools.setup(
     name="selenium_super_driver",
-    version="0.0.4",
+    version="0.0.5",
     author="aokuyama",
     author_email="mail@aokuyama.work",
     description="python sample package",
