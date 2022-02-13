@@ -94,6 +94,9 @@ class SuperDriver:
     def waiting(self):
         return self.waiter.waiting()
 
+    def run(self, script, response=None, option=None):
+        script.exec(response, option)
+
     def get(self, url):
         self.standby()
         return self.driver.get(url)
